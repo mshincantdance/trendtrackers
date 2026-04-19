@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trend Trackers — Student Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --dark: #1a1918;
+  --muted: #8a8680;
+  --border: #e0dbd0;
+  --rule-accent: #f5c842;
+  --stuck: #e03030;
+  --stuck-bg: #fff0f0;
+
+  --team-hue: 38;
+  --team-bg: #fef3c7;
+  --team-accent: #d97706;
+  --team-light: #fff9e8;
+  --team-border: #f0c060;
+  --team-text: #92400e;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 10px rgba(0,0,0,0.07);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.10);
+
+  --font-size: 16px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Lexend Deca', sans-serif; font-size: var(--font-size); background: var(--bg); color: var(--dark); min-height: 100vh; line-height: 1.5; }
+a { color: inherit; text-decoration: none; }
+button { font-family: 'Lexend Deca', sans-serif; cursor: pointer; border: none; background: none; }
+
+/* ── Screens ── */
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ══════════════════════════════════════
+   TEAM SELECTOR
+══════════════════════════════════════ */
+#screen-team {
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: var(--bg);
+}
+.selector-wrap { width: 100%; max-width: 860px; }
+.selector-header { margin-bottom: 2rem; }
+.selector-header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; }
+.selector-header p { font-size: 1rem; color: var(--muted); margin-top: .25rem; }
+
+.team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; margin-bottom: 1rem; }
+.team-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.25rem;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  display: flex; align-items: center; gap: 1rem;
+}
+.team-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.team-card.amber:hover { border-color: #d97706; }
+.team-card.green:hover  { border-color: #16a34a; }
+.team-card.blue:hover   { border-color: #2563eb; }
+.team-card.rose:hover   { border-color: #e11d48; }
+.team-card-emoji { font-size: 2.2rem; flex-shrink: 0; }
+.team-card-info { flex: 1; }
+.team-card-name { font-size: 1.15rem; font-weight: 700; }
+.team-card-topic { font-size: .85rem; color: var(--muted); margin-top: .15rem; line-height: 1.4; }
+.teacher-btn {
+  width: 100%; padding: .75rem; border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
+  color: var(--muted); font-size: .9rem; background: transparent; transition: border-color .15s, color .15s;
+}
+.teacher-btn:hover { border-color: var(--dark); color: var(--dark); }
+
+/* Color swatches on team cards */
+.team-card.amber { border-left: 5px solid #d97706; }
+.team-card.green  { border-left: 5px solid #16a34a; }
+.team-card.blue   { border-left: 5px solid #2563eb; }
+.team-card.rose   { border-left: 5px solid #e11d48; }
+
+/* ══════════════════════════════════════
+   SHARED TOPBAR
+══════════════════════════════════════ */
+.topbar {
+  background: var(--dark);
+  padding: .65rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: .75rem; }
+.back-btn {
+  color: rgba(255,255,255,.5); font-size: .85rem; font-weight: 500;
+  display: flex; align-items: center; gap: .35rem; transition: color .15s;
+}
+.back-btn:hover { color: #fff; }
+.topbar-team { font-size: 1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: .4rem; }
+.topbar-day { font-size: .85rem; color: rgba(255,255,255,.5); font-weight: 500; }
+.stuck-btn {
+  background: var(--stuck); color: #fff;
+  padding: .45rem 1rem; border-radius: 99px;
+  font-size: .88rem; font-weight: 700;
+  transition: opacity .15s, transform .1s;
+  display: flex; align-items: center; gap: .35rem;
+}
+.stuck-btn:hover { opacity: .9; transform: scale(1.02); }
+
+/* ══════════════════════════════════════
+   LAUNCH PAD HOME
+══════════════════════════════════════ */
+#screen-home { background: var(--bg); }
+.launchpad {
+  flex: 1;
+  padding: .85rem 1rem;
+  display: grid;
+  grid-template-columns: 300px 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: .75rem;
+  overflow: hidden;
+}
+
+/* ── Rules card ── */
+.rules-card {
+  background: var(--dark);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  grid-row: 1 / 3;
+  display: flex; flex-direction: column; gap: .7rem;
+  overflow: hidden;
+}
+.rules-card-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.35); font-weight: 600; }
+.rule-item { display: flex; flex-direction: column; gap: .1rem; border-left: 3px solid var(--rule-accent); padding-left: .65rem; }
+.rule-num { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--rule-accent); font-weight: 700; }
+.rule-text { font-size: .88rem; color: rgba(255,255,255,.88); line-height: 1.45; }
+
+/* ── Data links card ── */
+.links-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  grid-column: 2 / 4;
+  display: flex; flex-direction: column; gap: .5rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.card-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; margin-bottom: .1rem; }
+.links-section-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; display: flex; align-items: center; gap: .35rem; margin: .1rem 0; }
+.links-section-label.team-label { color: var(--team-accent); }
+.links-section-label.athens-label { color: #16a34a; }
+.links-section-label.general-label { color: var(--muted); }
+.links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .38rem; }
+.link-pill {
+  display: flex; align-items: center; gap: .5rem;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: .45rem .65rem; background: #fafaf8;
+  transition: border-color .12s, background .12s;
+  text-decoration: none;
+}
+.link-pill:hover { background: #f0f0eb; border-color: #bbb; }
+.link-pill.team  { background: #fffbe6; border-color: #f0c040; }
+.link-pill.team:hover { background: #fff5cc; border-color: #d4a800; }
+.link-pill.athens { background: #f0fdf4; border-color: #86efac; }
+.link-pill.athens:hover { background: #dcfce7; border-color: #4ade80; }
+.link-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--muted); }
+.link-dot.team   { background: #d97706; }
+.link-dot.athens { background: #16a34a; }
+.link-pill-text { flex: 1; min-width: 0; }
+.link-pill-name { font-size: .88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.link-pill-sub  { font-size: .7rem; color: var(--muted); }
+.links-more { font-size: .8rem; color: var(--muted); margin-top: .1rem; }
+.links-more a { color: var(--team-accent); font-weight: 600; text-decoration: underline; cursor: pointer; }
+
+/* ── Question card ── */
+.question-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: .4rem;
+  transition: border-color .15s, box-shadow .15s;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.question-card:hover { border-color: #93c5fd; box-shadow: var(--shadow-lg); }
+.question-current { font-size: .95rem; font-style: italic; line-height: 1.5; color: #1e3a5f; flex: 1; }
+.question-meta { font-size: .78rem; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+.question-badge { background: #dbeafe; color: #1d4ed8; padding: .15rem .5rem; border-radius: 99px; font-size: .72rem; font-weight: 700; }
+.question-tap { font-size: .8rem; color: #2563eb; font-weight: 600; }
+
+/* ── Checklist card ── */
+.checklist-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: flex; flex-direction: column; gap: .3rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.checklist-item { display: flex; align-items: center; gap: .5rem; font-size: .9rem; line-height: 1.4; }
+.checklist-item.done { color: var(--muted); }
+.check-icon { font-size: 1rem; flex-shrink: 0; width: 1.1rem; }
+.checklist-count { font-size: .8rem; color: var(--muted); margin-top: auto; padding-top: .3rem; border-top: 1px solid var(--border); }
+
+/* ── Bottom dock ── */
+.dock {
+  background: var(--surface);
+  border-top: 1.5px solid var(--border);
+  padding: .5rem .85rem;
+  display: flex; gap: .4rem; flex-shrink: 0;
+}
+.dock-btn {
+  flex: 1; padding: .5rem .25rem;
+  border-radius: var(--radius-sm);
+  font-size: .85rem; font-weight: 600; color: var(--muted);
+  transition: background .15s, color .15s;
+  text-align: center;
+}
+.dock-btn:hover { background: var(--bg); color: var(--dark); }
+.dock-btn.active { background: var(--team-bg); color: var(--team-text); }
+
+/* ══════════════════════════════════════
+   QUESTION / RQ REVISION SCREEN
+══════════════════════════════════════ */
+#screen-question { background: var(--bg); }
+.question-layout {
+  flex: 1; display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: .85rem; padding: .85rem 1rem;
+  overflow: hidden;
+}
+
+/* Left: signal rotator */
+.signal-panel {
+  display: flex; flex-direction: column; gap: .75rem; overflow: hidden;
+}
+.signal-card {
+  background: var(--dark);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  flex-shrink: 0;
+  min-height: 160px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.signal-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.35); font-weight: 600; margin-bottom: .6rem; }
+.signal-text {
+  font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1.35;
+  flex: 1; display: flex; align-items: center;
+  transition: opacity .25s, transform .25s;
+}
+.signal-text.fade-out { opacity: 0; transform: translateY(-8px); }
+.signal-text.fade-in  { opacity: 1; transform: translateY(0); }
+.signal-controls { display: flex; align-items: center; gap: .6rem; margin-top: .8rem; }
+.signal-arrow {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,.12); color: #fff; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .15s; flex-shrink: 0;
+}
+.signal-arrow:hover { background: rgba(255,255,255,.22); }
+.signal-dots { display: flex; gap: .3rem; align-items: center; flex: 1; flex-wrap: wrap; }
+.signal-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.25); transition: background .2s; }
+.signal-dot.active { background: var(--rule-accent); width: 18px; border-radius: 3px; }
+.signal-counter { font-size: .8rem; color: rgba(255,255,255,.4); margin-left: auto; }
+
+/* Condensed links on question screen */
+.q-links-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: .9rem 1rem;
+  flex: 1; overflow-y: auto; box-shadow: var(--shadow);
+}
+.link-row {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem 0; border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: opacity .12s;
+}
+.link-row:last-child { border-bottom: none; }
+.link-row:hover { opacity: .75; }
+.link-row-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.link-row-dot.team   { background: #d97706; }
+.link-row-dot.athens { background: #16a34a; }
+.link-row-dot.general { background: var(--border); }
+.link-row-name { font-size: .88rem; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.link-row-arrow { font-size: .8rem; color: var(--muted); }
+
+/* Right: RQ revision panel */
+.rq-panel {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem;
+  display: flex; flex-direction: column; gap: .65rem;
+  overflow: hidden; box-shadow: var(--shadow);
+}
+.rq-current {
+  background: #eff6ff; border: 1.5px solid #93c5fd;
+  border-radius: var(--radius-sm); padding: .8rem 1rem;
+  flex-shrink: 0;
+}
+.rq-current-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: #2563eb; font-weight: 700; margin-bottom: .3rem; }
+.rq-current-text { font-size: .95rem; font-style: italic; line-height: 1.5; color: #1e3a5f; font-weight: 500; }
+
+.rq-history { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; }
+.rq-log { display: flex; flex-direction: column; gap: .4rem; flex: 1; overflow-y: auto; }
+.rq-entry {
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: .6rem .75rem; display: flex; flex-direction: column; gap: .15rem;
+}
+.rq-entry.current-entry { border-color: #93c5fd; background: #f0f7ff; }
+.rq-entry.future { border-style: dashed; opacity: .5; }
+.rq-entry-top { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.rq-day-badge {
+  font-size: .7rem; font-weight: 700; padding: .15rem .5rem;
+  border-radius: 99px; flex-shrink: 0;
+}
+.rq-day-badge.start   { background: #f0fdf4; color: #16a34a; }
+.rq-day-badge.rev     { background: #fef9c3; color: #a16207; }
+.rq-day-badge.current { background: #1a1918; color: #fff; }
+.rq-entry-text { font-size: .88rem; font-style: italic; line-height: 1.4; }
+.rq-entry-note { font-size: .78rem; color: var(--muted); }
+
+/* Form */
+.rq-form { border-top: 1.5px solid var(--border); padding-top: .65rem; flex-shrink: 0; }
+.rq-form-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; font-weight: 700; color: var(--dark); margin-bottom: .45rem; }
+.rq-textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: .6rem .8rem; font-family: 'Lexend Deca', sans-serif; font-size: .9rem;
+  resize: none; outline: none; transition: border-color .15s; background: var(--bg);
+  line-height: 1.5;
+}
+.rq-textarea:focus { border-color: #93c5fd; }
+.rq-save-btn {
+  margin-top: .45rem; width: 100%; padding: .6rem;
+  background: var(--dark); color: #fff; border-radius: var(--radius-sm);
+  font-size: .9rem; font-weight: 700; transition: opacity .15s;
+}
+.rq-save-btn:hover { opacity: .85; }
+
+/* ══════════════════════════════════════
+   STUCK SCREENS
+══════════════════════════════════════ */
+#screen-stuck-1, #screen-stuck-2, #screen-protocol { background: var(--bg); }
+.stuck-wrap { flex: 1; padding: 1.5rem; max-width: 560px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+.stuck-title { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.stuck-sub { font-size: .95rem; color: var(--muted); }
+.stuck-dots { display: flex; gap: .4rem; }
+.stuck-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.stuck-dot.on { background: var(--stuck); width: 24px; border-radius: 4px; }
+.stuck-options { display: flex; flex-direction: column; gap: .6rem; flex: 1; }
+.stuck-option {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: .95rem 1.1rem;
+  display: flex; align-items: flex-start; gap: .75rem;
+  cursor: pointer; transition: border-color .15s, box-shadow .15s;
+  text-align: left;
+}
+.stuck-option:hover { border-color: var(--stuck); box-shadow: 0 0 0 3px rgba(224,48,48,.08); }
+.stuck-num { font-size: .72rem; font-weight: 700; color: var(--stuck); text-transform: uppercase; letter-spacing: .08em; flex-shrink: 0; margin-top: .1rem; }
+.stuck-option-text { font-size: .95rem; line-height: 1.5; font-weight: 500; }
+.more-btn {
+  padding: .75rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--muted); font-size: .88rem; font-weight: 600; transition: all .15s;
+}
+.more-btn:hover { border-color: var(--dark); color: var(--dark); }
+
+/* Protocol screen */
+.protocol-box {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.protocol-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 600; margin-bottom: .5rem; }
+.protocol-title { font-size: 1.1rem; font-weight: 700; margin-bottom: .75rem; line-height: 1.35; }
+.protocol-text { font-size: .95rem; color: #444; line-height: 1.7; }
+.still-stuck { margin-top: .5rem; }
+.still-stuck-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: #a16207; font-weight: 700; margin-bottom: .5rem; }
+.still-stuck p { font-size: .9rem; color: var(--muted); margin-bottom: .75rem; line-height: 1.6; }
+.msg-textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: .75rem; font-family: 'Lexend Deca', sans-serif; font-size: .9rem;
+  resize: vertical; min-height: 90px; outline: none; background: var(--bg);
+  transition: border-color .15s; line-height: 1.5; margin-bottom: .6rem;
+}
+.msg-textarea:focus { border-color: #f0c040; }
+.send-btn {
+  width: 100%; padding: .8rem;
+  background: #a16207; color: #fff; border-radius: var(--radius-sm);
+  font-size: .9rem; font-weight: 700; transition: opacity .15s;
+}
+.send-btn:hover { opacity: .88; }
+.send-note { font-size: .75rem; color: var(--muted); text-align: center; margin-top: .4rem; }
+
+/* ══════════════════════════════════════
+   TEACHER VIEW
+══════════════════════════════════════ */
+#screen-teacher { background: var(--bg); }
+.teacher-wrap { flex: 1; padding: 1rem 1.25rem; max-width: 960px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: .85rem; }
+.teacher-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: .65rem; }
+.stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: .85rem; text-align: center; }
+.stat-num { font-size: 1.6rem; font-weight: 700; }
+.stat-label { font-size: .78rem; color: var(--muted); margin-top: .15rem; }
+.team-table { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.tt-header { display: grid; grid-template-columns: 150px 1fr 120px 80px 110px; gap: .5rem; padding: .6rem 1rem; background: var(--bg); border-bottom: 1.5px solid var(--border); font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.tt-row { display: grid; grid-template-columns: 150px 1fr 120px 80px 110px; gap: .5rem; padding: .85rem 1rem; border-bottom: 1.5px solid var(--border); align-items: center; transition: background .12s; }
+.tt-row:last-child { border-bottom: none; }
+.tt-row:hover { background: #faf9f7; }
+.tt-row.flagged { background: #fff5f5; }
+.tt-name { font-weight: 700; font-size: .95rem; display: flex; align-items: center; gap: .4rem; }
+.tt-q { font-size: .85rem; font-style: italic; color: #444; line-height: 1.4; }
+.tt-dataset { font-size: .8rem; }
+.tt-dataset.ok { color: #16a34a; font-weight: 600; }
+.tt-dataset.missing { color: var(--stuck); font-weight: 600; }
+.tt-progress { font-size: .9rem; }
+.status-badge { font-size: .75rem; font-weight: 700; padding: .2rem .6rem; border-radius: 99px; }
+.status-badge.ok { background: #dcfce7; color: #15803d; }
+.status-badge.flag { background: #fee2e2; color: #b91c1c; }
+
+/* ══════════════════════════════════════
+   TWEAKS PANEL
+══════════════════════════════════════ */
+.tweaks-panel {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow-lg); z-index: 999;
+  display: none; flex-direction: column; gap: .75rem;
+  min-width: 240px;
+}
+.tweaks-panel.visible { display: flex; }
+.tweaks-title { font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.tweak-row { display: flex; flex-direction: column; gap: .3rem; }
+.tweak-label { font-size: .78rem; color: var(--muted); }
+.tweak-select { font-family: 'Lexend Deca', sans-serif; font-size: .88rem; padding: .35rem .5rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); width: 100%; outline: none; }
+.tweak-range { width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ TEAM SELECTOR ══════════════════ -->
+<div id="screen-team" class="screen active">
+  <div class="selector-wrap">
+    <div class="selector-header">
+      <h1>Trend Trackers</h1>
+      <p>Athens-Clarke County · Algebra 1 A1.3 · Day <span id="sel-day"></span> of <span id="sel-total"></span></p>
+    </div>
+    <div class="team-grid" id="team-grid"></div>
+    <button class="teacher-btn" onclick="goTo('screen-teacher')">Teacher view →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ LAUNCH PAD HOME ══════════════════ -->
+<div id="screen-home" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goTo('screen-team')">← All teams</button>
+      <span class="topbar-team" id="home-team-name"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.85rem">
+      <button class="stuck-btn" onclick="goTo('screen-stuck-1')">🚨 I'm stuck — help me</button>
+      <span class="topbar-day" id="home-day"></span>
+    </div>
+  </div>
+
+  <div class="launchpad">
+    <!-- Rules -->
+    <div class="rules-card">
+      <div class="rules-card-label">The 5 Rules</div>
+      <div id="rules-list" style="display:flex;flex-direction:column;gap:.65rem;flex:1;overflow:hidden"></div>
+    </div>
+
+    <!-- Data Links -->
+    <div class="links-card">
+      <div class="card-label">Data links &amp; tools</div>
+      <div id="links-content"></div>
+    </div>
+
+    <!-- Our Question -->
+    <div class="question-card" onclick="goTo('screen-question')">
+      <div class="card-label">Our research question</div>
+      <div class="question-current" id="home-question-text"></div>
+      <div class="question-meta">
+        <span class="question-badge" id="home-rq-badge"></span>
+        <span class="question-tap">Tap to view &amp; revise →</span>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="checklist-card">
+      <div class="card-label">Infographic checklist</div>
+      <div id="checklist-list" style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.2rem"></div>
+      <div class="checklist-count" id="checklist-count"></div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <button class="dock-btn active" onclick="goTo('screen-home')">Home</button>
+    <button class="dock-btn" onclick="goTo('screen-question')">Question</button>
+    <button class="dock-btn" onclick="goTo('screen-stuck-1')">🚨 Stuck</button>
+  </div>
+</div>
+
+<!-- ══════════════════ QUESTION SCREEN ══════════════════ -->
+<div id="screen-question" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goTo('screen-home')">← Home</button>
+      <span class="topbar-team" id="q-team-name"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.85rem">
+      <button class="stuck-btn" onclick="goTo('screen-stuck-1')">🚨 I'm stuck — help me</button>
+      <span class="topbar-day" id="q-day"></span>
+    </div>
+  </div>
+
+  <div class="question-layout">
+    <!-- Left: signal rotator + condensed links -->
+    <div class="signal-panel">
+      <div class="signal-card">
+        <div class="signal-label">Flag this signal in your data</div>
+        <div class="signal-text" id="signal-text"></div>
+        <div class="signal-controls">
+          <button class="signal-arrow" onclick="prevSignal()">‹</button>
+          <div class="signal-dots" id="signal-dots"></div>
+          <button class="signal-arrow" onclick="nextSignal()">›</button>
+          <span class="signal-counter" id="signal-counter"></span>
+        </div>
+      </div>
+      <div class="q-links-card">
+        <div class="card-label" style="margin-bottom:.5rem">Your data links</div>
+        <div id="q-links-list"></div>
+      </div>
+    </div>
+
+    <!-- Right: RQ revision -->
+    <div class="rq-panel">
+      <div class="card-label">Research question tracker</div>
+      <div class="rq-current">
+        <div class="rq-current-label">Current question</div>
+        <div class="rq-current-text" id="rq-current-text"></div>
+      </div>
+      <div class="rq-history">Revision history</div>
+      <div class="rq-log" id="rq-log"></div>
+      <div class="rq-form" id="rq-form">
+        <div class="rq-form-label" id="rq-form-label"></div>
+        <textarea class="rq-textarea" id="rq-new-q" rows="2" placeholder="New research question..."></textarea>
+        <textarea class="rq-textarea" id="rq-why" rows="1" placeholder="Why did your question change?" style="margin-top:.35rem"></textarea>
+        <button class="rq-save-btn" onclick="saveRevision()">Save revision ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <button class="dock-btn" onclick="goTo('screen-home')">Home</button>
+    <button class="dock-btn active" onclick="goTo('screen-question')">Question</button>
+    <button class="dock-btn" onclick="goTo('screen-stuck-1')">🚨 Stuck</button>
+  </div>
+</div>
+
+<!-- ══════════════════ STUCK PAGE 1 ══════════════════ -->
+<div id="screen-stuck-1" class="screen">
+  <div class="topbar">
+    <button class="back-btn" style="color:rgba(255,255,255,.5)" onclick="goTo('screen-home')">← Back to my hub</button>
+  </div>
+  <div class="stuck-wrap">
+    <div>
+      <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.35rem">Stuck Protocol</div>
+      <div class="stuck-title">What kind of stuck?</div>
+      <div class="stuck-sub" style="margin-top:.35rem">Pick the one that matches right now.</div>
+    </div>
+    <div class="stuck-dots">
+      <div class="stuck-dot on"></div><div class="stuck-dot"></div>
+    </div>
+    <div class="stuck-options">
+      <button class="stuck-option" onclick="showProtocol(1)"><span class="stuck-num">01</span><span class="stuck-option-text">I can't find the data I'm looking for</span></button>
+      <button class="stuck-option" onclick="showProtocol(2)"><span class="stuck-num">02</span><span class="stuck-option-text">The data only shows Georgia or a huge region — not my county</span></button>
+      <button class="stuck-option" onclick="showProtocol(3)"><span class="stuck-num">03</span><span class="stuck-option-text">I don't know where to look</span></button>
+      <button class="stuck-option" onclick="showProtocol(4)"><span class="stuck-num">04</span><span class="stuck-option-text">I can't figure out how to use the website or filter</span></button>
+    </div>
+    <button class="more-btn" onclick="goTo('screen-stuck-2')">More options →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ STUCK PAGE 2 ══════════════════ -->
+<div id="screen-stuck-2" class="screen">
+  <div class="topbar">
+    <button class="back-btn" style="color:rgba(255,255,255,.5)" onclick="goTo('screen-stuck-1')">← Back</button>
+  </div>
+  <div class="stuck-wrap">
+    <div>
+      <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.35rem">Stuck Protocol</div>
+      <div class="stuck-title">What kind of stuck?</div>
+      <div class="stuck-sub" style="margin-top:.35rem">Pick the one that matches right now.</div>
+    </div>
+    <div class="stuck-dots">
+      <div class="stuck-dot"></div><div class="stuck-dot on"></div>
+    </div>
+    <div class="stuck-options">
+      <button class="stuck-option" onclick="showProtocol(5)"><span class="stuck-num">05</span><span class="stuck-option-text">I found the data but now I can't find it again</span></button>
+      <button class="stuck-option" onclick="showProtocol(6)"><span class="stuck-num">06</span><span class="stuck-option-text">The data exists but not at the level I need (e.g. no school-level data)</span></button>
+      <button class="stuck-option" onclick="showProtocol(7)"><span class="stuck-num">07</span><span class="stuck-option-text">I found a number but I don't know if it's useful</span></button>
+      <button class="stuck-option" onclick="showProtocol(8)"><span class="stuck-num">08</span><span class="stuck-option-text">My research question is too vague — I don't know what to search</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ STUCK PROTOCOL ══════════════════ -->
+<div id="screen-protocol" class="screen">
+  <div class="topbar">
+    <button class="back-btn" style="color:rgba(255,255,255,.5)" id="protocol-back">← Back</button>
+  </div>
+  <div class="stuck-wrap">
+    <div class="protocol-box">
+      <div class="protocol-label">Try this first</div>
+      <div class="protocol-title" id="proto-title"></div>
+      <div class="protocol-text" id="proto-text"></div>
+    </div>
+    <div class="still-stuck">
+      <div class="still-stuck-label">Still stuck?</div>
+      <p>Write what's happening for Ms. Shin. Be specific — what did you try, what did you find, what isn't working.</p>
+      <textarea class="msg-textarea" id="msg-input" placeholder="Describe what you tried and where you got stuck..."></textarea>
+      <button class="send-btn" onclick="sendEmail()">📧 Send to Ms. Shin</button>
+      <div class="send-note">Opens your email app with your message pre-filled.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TEACHER VIEW ══════════════════ -->
+<div id="screen-teacher" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" onclick="goTo('screen-team')">← Back to teams</button>
+      <span class="topbar-team">Teacher Overview</span>
+    </div>
+    <span class="topbar-day" id="teacher-day"></span>
+  </div>
+  <div class="teacher-wrap">
+    <div class="teacher-stats" id="teacher-stats"></div>
+    <div class="team-table">
+      <div class="tt-header">
+        <div>Team</div><div>Current research question</div><div>Dataset</div><div>Progress</div><div>Status</div>
+      </div>
+      <div id="teacher-rows"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TWEAKS ══════════════════ -->
+<div class="tweaks-panel" id="tweaks-panel">
+  <div class="tweaks-title">Tweaks</div>
+  <div class="tweak-row">
+    <div class="tweak-label">Current day (1–15)</div>
+    <input type="range" class="tweak-range" min="1" max="15" value="3" id="tweak-day" oninput="setDay(+this.value)">
+    <div style="font-size:.82rem;color:var(--dark);font-weight:600" id="tweak-day-val">Day 3</div>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Font size</div>
+    <input type="range" class="tweak-range" min="14" max="20" value="16" id="tweak-font" oninput="setFont(+this.value)">
+    <div style="font-size:.82rem;color:var(--dark)" id="tweak-font-val">16px</div>
+  </div>
+  <div class="tweak-row">
+    <div class="tweak-label">Preview team</div>
+    <select class="tweak-select" id="tweak-team" onchange="previewTeam(this.value)">
+      <option value="">— pick a team —</option>
+      <option value="archer">🏛️ Archer</option>
+      <option value="julia-peter">💊 Julia + Peter</option>
+      <option value="rose-zuzu">🏘️ Rose + Zuzu</option>
+      <option value="wyatt-ora">🌿 Wyatt + Ora</option>
+    </select>
+  </div>
+</div>
+
+<script src="hub-data.js"></script>
+<script>
+// ── State ──
+let currentTeam = null;
+let currentProtocolPage = 1;
+let currentProtocolNum = null;
+let signalIdx = 0;
+let signalAnimating = false;
+let currentDay = 3;
+
+// ── Navigation ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  localStorage.setItem('tt-screen', id);
+  if (id === 'screen-home' && currentTeam) renderHome();
+  if (id === 'screen-question' && currentTeam) renderQuestion();
+  if (id === 'screen-teacher') renderTeacher();
+}
+
+// ── Team colors ──
+const TEAM_COLORS = {
+  amber: { bg:'#fef3c7', accent:'#d97706', light:'#fffbe8', border:'#f0c060', text:'#92400e', dot:'#d97706' },
+  blue:  { bg:'#dbeafe', accent:'#2563eb', light:'#eff6ff', border:'#93c5fd', text:'#1e40af', dot:'#2563eb' },
+  rose:  { bg:'#ffe4e6', accent:'#e11d48', light:'#fff1f2', border:'#fca5a5', text:'#9f1239', dot:'#e11d48' },
+  green: { bg:'#dcfce7', accent:'#16a34a', light:'#f0fdf4', border:'#86efac', text:'#14532d', dot:'#16a34a' },
+};
+
+function applyTeamColors(team) {
+  const c = TEAM_COLORS[team.color];
+  const root = document.documentElement;
+  root.style.setProperty('--team-bg',     c.bg);
+  root.style.setProperty('--team-accent', c.accent);
+  root.style.setProperty('--team-light',  c.light);
+  root.style.setProperty('--team-border', c.border);
+  root.style.setProperty('--team-text',   c.text);
+}
+
+// ── Build team selector ──
+function buildSelector() {
+  document.getElementById('sel-day').textContent = currentDay;
+  document.getElementById('sel-total').textContent = TOTAL_DAYS;
+  const grid = document.getElementById('team-grid');
+  grid.innerHTML = '';
+  Object.values(TEAMS).forEach(t => {
+    const card = document.createElement('div');
+    card.className = `team-card ${t.color}`;
+    card.innerHTML = `
+      <div class="team-card-emoji">${t.emoji}</div>
+      <div class="team-card-info">
+        <div class="team-card-name">${t.name}</div>
+        <div class="team-card-topic">${t.topic}</div>
+      </div>`;
+    card.onclick = () => openTeam(t.id);
+    grid.appendChild(card);
+  });
+}
+
+function openTeam(id) {
+  currentTeam = TEAMS[id];
+  applyTeamColors(currentTeam);
+  localStorage.setItem('tt-team', id);
+  goTo('screen-home');
+}
+
+// ── Render home ──
+function renderHome() {
+  const t = currentTeam;
+  document.getElementById('home-team-name').textContent = `${t.emoji} ${t.name}`;
+  document.getElementById('home-day').textContent = `Day ${currentDay} of ${TOTAL_DAYS}`;
+
+  // Rules
+  const rulesList = document.getElementById('rules-list');
+  rulesList.innerHTML = RULES.map(r => `
+    <div class="rule-item">
+      <div class="rule-num">Rule ${r.num}</div>
+      <div class="rule-text">${r.text}</div>
+    </div>`).join('');
+
+  // Links
+  renderLinks();
+
+  // Question
+  const qrev = t.question.revisions;
+  const cur = qrev.find(r => r.current) || qrev[qrev.length-1];
+  document.getElementById('home-question-text').textContent = `"${cur.text}"`;
+  const revNum = qrev.filter(r => r.label !== 'Start').length;
+  document.getElementById('home-rq-badge').textContent = `Revision ${revNum} of 5`;
+
+  // Checklist
+  const list = document.getElementById('checklist-list');
+  const count = document.getElementById('checklist-count');
+  const done = t.checklist.filter(c => c.done).length;
+  list.innerHTML = t.checklist.slice(0, 6).map(c => `
+    <div class="checklist-item ${c.done ? 'done' : ''}">
+      <span class="check-icon">${c.done ? '✅' : '⬜'}</span>
+      <span>${c.text}</span>
+    </div>`).join('');
+  count.textContent = `${done} of ${t.checklist.length} complete`;
+}
+
+function renderLinks() {
+  const t = currentTeam;
+  const el = document.getElementById('links-content');
+  let html = '';
+
+  if (t.links.length) {
+    // Group by sub-label if present
+    const hasSubs = t.links.some(l => l.sub);
+    if (hasSubs) {
+      const groups = {};
+      t.links.forEach(l => { const k = l.sub||''; (groups[k]=groups[k]||[]).push(l); });
+      Object.entries(groups).forEach(([sub, links]) => {
+        html += `<div class="links-section-label team-label">${sub ? sub+' — ' : ''}Your links ★</div>`;
+        html += `<div class="links-grid" style="margin-bottom:.4rem">` + links.map(l => linkPill(l, 'team')).join('') + `</div>`;
+      });
+    } else {
+      html += `<div class="links-section-label team-label">★ Your links</div>`;
+      html += `<div class="links-grid" style="margin-bottom:.4rem">` + t.links.map(l => linkPill(l, 'team')).join('') + `</div>`;
+    }
+  }
+
+  if (t.athens.length) {
+    html += `<div class="links-section-label athens-label">Athens-specific</div>`;
+    html += `<div class="links-grid" style="margin-bottom:.35rem">` + t.athens.map(l => linkPill(l, 'athens')).join('') + `</div>`;
+  }
+
+  if (t.general.length) {
+    html += `<div class="links-section-label general-label">General sources</div>`;
+    html += `<div class="links-grid">` + t.general.map(l => linkPill(l, '')).join('') + `</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function linkPill(l, type) {
+  return `<a class="link-pill ${type}" href="${l.url}" target="_blank" rel="noopener">
+    <div class="link-dot ${type}"></div>
+    <div class="link-pill-text">
+      <div class="link-pill-name">${l.label}</div>
+      <div class="link-pill-sub">${l.desc}</div>
+    </div>
+  </a>`;
+}
+
+// ── Signal rotator ──
+function renderSignalDots() {
+  const dots = document.getElementById('signal-dots');
+  dots.innerHTML = SIGNALS.map((_, i) =>
+    `<div class="signal-dot ${i===signalIdx?'active':''}"></div>`).join('');
+  document.getElementById('signal-counter').textContent = `${signalIdx+1} of ${SIGNALS.length}`;
+}
+
+function setSignal(idx, animate=true) {
+  if (signalAnimating) return;
+  const el = document.getElementById('signal-text');
+  if (!el) return;
+  if (animate) {
+    signalAnimating = true;
+    el.classList.add('fade-out');
+    setTimeout(() => {
+      signalIdx = ((idx % SIGNALS.length) + SIGNALS.length) % SIGNALS.length;
+      el.textContent = SIGNALS[signalIdx];
+      el.classList.remove('fade-out');
+      el.classList.add('fade-in');
+      renderSignalDots();
+      setTimeout(() => { el.classList.remove('fade-in'); signalAnimating = false; }, 250);
+    }, 200);
+  } else {
+    signalIdx = ((idx % SIGNALS.length) + SIGNALS.length) % SIGNALS.length;
+    el.textContent = SIGNALS[signalIdx];
+    renderSignalDots();
+  }
+}
+function nextSignal() { setSignal(signalIdx + 1); }
+function prevSignal() { setSignal(signalIdx - 1); }
+
+// ── Render question screen ──
+function renderQuestion() {
+  const t = currentTeam;
+  document.getElementById('q-team-name').textContent = `${t.emoji} ${t.name}`;
+  document.getElementById('q-day').textContent = `Day ${currentDay} of ${TOTAL_DAYS}`;
+
+  // Signal
+  const sigEl = document.getElementById('signal-text');
+  if (sigEl) { sigEl.textContent = SIGNALS[signalIdx]; renderSignalDots(); }
+
+  // Condensed links
+  const allLinks = [
+    ...t.links.map(l => ({...l, type:'team'})),
+    ...t.athens.map(l => ({...l, type:'athens'})),
+    ...t.general.map(l => ({...l, type:'general'}))
+  ];
+  document.getElementById('q-links-list').innerHTML = allLinks.map(l => `
+    <a class="link-row" href="${l.url}" target="_blank" rel="noopener">
+      <div class="link-row-dot ${l.type}"></div>
+      <div class="link-row-name">${l.label}</div>
+      <div class="link-row-arrow">↗</div>
+    </a>`).join('');
+
+  // Current question
+  const cur = t.question.revisions.find(r => r.current) || t.question.revisions.at(-1);
+  document.getElementById('rq-current-text').textContent = `"${cur.text}"`;
+
+  // Revision log
+  const log = document.getElementById('rq-log');
+  const FUTURE_DAYS = [1,2,4,7,9].filter(d => !t.question.revisions.some(r => r.day === `Day ${d}` || r.label === 'Start'));
+  const futureEntries = ['Day 5 · Revision 3','Day 7 · Revision 4','Day 9 · Revision 5 🔒'].slice(t.question.revisions.filter(r=>r.label!=='Start').length);
+
+  log.innerHTML = t.question.revisions.map(r => `
+    <div class="rq-entry ${r.current ? 'current-entry' : ''}">
+      <div class="rq-entry-top">
+        <span class="rq-day-badge ${r.label==='Start'?'start':r.current?'current':'rev'}">${r.day} · ${r.label}</span>
+      </div>
+      <div class="rq-entry-text">"${r.text}"</div>
+      <div class="rq-entry-note">${r.note}</div>
+    </div>`).join('') +
+    futureEntries.map(f => `
+    <div class="rq-entry future">
+      <div class="rq-entry-text" style="font-style:normal;color:var(--muted)">${f} — not yet</div>
+    </div>`).join('');
+
+  // Form
+  const nextRev = t.question.revisions.filter(r=>r.label!=='Start').length + 1;
+  const nextRevDay = [2,4,5,7,9][nextRev-1] || 9;
+  document.getElementById('rq-form-label').textContent = `Log Revision ${nextRev} (Day ${nextRevDay})`;
+  document.getElementById('rq-new-q').value = '';
+  document.getElementById('rq-why').value = '';
+}
+
+function saveRevision() {
+  const newQ = document.getElementById('rq-new-q').value.trim();
+  const why  = document.getElementById('rq-why').value.trim();
+  if (!newQ) { document.getElementById('rq-new-q').focus(); return; }
+  const t = currentTeam;
+  t.question.revisions.forEach(r => r.current = false);
+  const revNum = t.question.revisions.filter(r=>r.label!=='Start').length + 1;
+  t.question.revisions.push({
+    day: `Day ${currentDay}`, label: `Rev ${revNum}`,
+    text: newQ, note: why || 'No reason recorded', current: true
+  });
+  renderQuestion();
+  renderHome();
+  alert('Revision saved! ✓');
+}
+
+// ── Stuck protocol ──
+function showProtocol(num) {
+  currentProtocolNum = num;
+  const p = PROTOCOLS[num];
+  document.getElementById('proto-title').textContent = p.title;
+  document.getElementById('proto-text').textContent = p.text;
+  document.getElementById('protocol-back').onclick = () => goTo(p.page===1 ? 'screen-stuck-1' : 'screen-stuck-2');
+  document.getElementById('msg-input').value = '';
+  goTo('screen-protocol');
+}
+
+function sendEmail() {
+  const msg = document.getElementById('msg-input').value.trim();
+  if (!msg) { document.getElementById('msg-input').focus(); return; }
+  const t = currentTeam || { name: 'Unknown team' };
+  const p = PROTOCOLS[currentProtocolNum];
+  const subject = `[Trend Trackers] ${t.name} is stuck — ${p.title}`;
+  const body = `Team: ${t.name}\nStuck type: ${p.title}\n\nWhat's happening:\n${msg}`;
+  window.location.href = `mailto:${TEACHER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// ── Teacher view ──
+function renderTeacher() {
+  document.getElementById('teacher-day').textContent = `Day ${currentDay} of ${TOTAL_DAYS}`;
+  const teams = Object.values(TEAMS);
+  const flagged = teams.filter(t => !t.links || t.checklist.filter(c=>c.done).length < 2);
+
+  document.getElementById('teacher-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${teams.length}</div><div class="stat-label">Teams active</div></div>
+    <div class="stat-card"><div class="stat-num">${teams.filter(t=>t.question.revisions.length>1).length}/${teams.length}</div><div class="stat-label">RQ revised</div></div>
+    <div class="stat-card"><div class="stat-num">${teams.filter(t=>t.links.length>0).length}/${teams.length}</div><div class="stat-label">Dataset confirmed</div></div>
+    <div class="stat-card" style="border-color:${flagged.length?'#fca5a5':'var(--border)'}">
+      <div class="stat-num" style="color:${flagged.length?'var(--stuck)':'inherit'}">${flagged.length}</div>
+      <div class="stat-label">Needs attention</div>
+    </div>`;
+
+  document.getElementById('teacher-rows').innerHTML = teams.map(t => {
+    const done = t.checklist.filter(c=>c.done).length;
+    const isFlagged = t.links.length === 0;
+    const cur = t.question.revisions.find(r=>r.current)||t.question.revisions.at(-1);
+    return `<div class="tt-row ${isFlagged?'flagged':''}">
+      <div class="tt-name">${t.emoji} ${t.name}</div>
+      <div class="tt-q">"${cur.text}"</div>
+      <div class="tt-dataset ${t.links.length?'ok':'missing'}">${t.links.length?'✓ Confirmed':'⚠ Missing'}</div>
+      <div class="tt-progress">${done}/${t.checklist.length}</div>
+      <div><span class="status-badge ${isFlagged?'flag':'ok'}">${isFlagged?'Check in !':'On track'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── Tweaks ──
+function setDay(d) {
+  currentDay = d;
+  document.getElementById('tweak-day-val').textContent = `Day ${d}`;
+  if (currentTeam) { renderHome(); renderQuestion(); }
+  buildSelector();
+}
+function setFont(size) {
+  document.documentElement.style.setProperty('--font-size', size+'px');
+  document.getElementById('tweak-font-val').textContent = size+'px';
+}
+function previewTeam(id) {
+  if (!id) return;
+  openTeam(id);
+}
+
+// Tweaks host protocol
+window.addEventListener('message', e => {
+  if (e.data?.type === '__activate_edit_mode')   document.getElementById('tweaks-panel').classList.add('visible');
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').classList.remove('visible');
+});
+window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+// ── Init ──
+function init() {
+  currentDay = CURRENT_DAY;
+  buildSelector();
+
+  // Restore session
+  const savedTeam   = localStorage.getItem('tt-team');
+  const savedScreen = localStorage.getItem('tt-screen');
+  if (savedTeam && TEAMS[savedTeam]) {
+    currentTeam = TEAMS[savedTeam];
+    applyTeamColors(currentTeam);
+    const screen = savedScreen || 'screen-home';
+    goTo(screen);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
